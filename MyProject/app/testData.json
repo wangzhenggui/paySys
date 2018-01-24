@@ -1,0 +1,27 @@
+{
+  "data": [{
+    "icon": "baobei1",
+    "text": "项目管理"
+  }, {
+    "icon": "baobei2",
+    "text": "客户信息"
+  }, {
+    "icon": "baobei3",
+    "text": "业务性能"
+  }, {
+    "icon": "baobei4",
+    "text": "业务查询"
+  }, {
+    "icon": "baobei5",
+    "text": "业务开通"
+  }, {
+    "icon": "baobei6",
+    "text": "业务统计"
+  },{
+    "icon": "baobei7",
+    "text": "当前投诉"
+  },{
+    "icon": "baobei8",
+    "text": "当前故障"
+  }]
+}
