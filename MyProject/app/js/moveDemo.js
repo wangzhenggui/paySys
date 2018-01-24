@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
    flexDirection:'row',
    justifyContent:'flex-end',
    paddingRight:5,
-   paddingTop:3
+   paddingTop:4
  },
  smalltitle:{
    width:viewWidth,
