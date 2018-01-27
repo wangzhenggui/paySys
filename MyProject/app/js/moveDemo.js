@@ -11,82 +11,20 @@ const itemWidth = 100
 const itemTop = 10
 const colNum = 3
 const subHeight = 80
+var items = []
 export default class MoveDemo extends Component<{}> {
 
   constructor(props) {
     super(props);
+    this.mappingItems = ['客户信息','当前故障','当前投诉','业务开通','业务性能'];
+    this.order = ['客户信息','当前故障','当前投诉','业务开通','业务性能'];
     this.state = {
       isManage : false,
       manageName:"管理",
-      names:['客户信息','当前故障','当前投诉','业务开通','业务性能']
+      viewSize:this.order.length
     }
-    this.items = [];
-    this.order = [];
+
   }
-
-
- componentWillMount(){
-   this._panResponder = PanResponder.create({
-     onStartShouldSetPanResponder: (evt, gestureState) => true,
-     onMoveShouldSetPanResponder: (evt, gestureState) => true,
-     // 开始手势操作。给用户一些视觉反馈，让他们知道发生了什么事情！
-     onPanResponderGrant: (evt, gestureState) => {
-              const {pageX,locationX,pageY,locationY} = evt.nativeEvent;
-              //pageX 在最外层的视图中的坐标
-              //locationX  相对于本身移动的位置
-             // gestureState.{x,y}0 现在会被设置为0
-              this.currentPageId = this._getIdByPosition(pageX,pageY);
-              this.preY = pageY - locationY - subHeight;   //TODO  此处的50为上面的View的高度
-              this.preX = pageX - locationX;
-              console.log("locationX:" + locationX + "  locationY:" + locationY);
-              console.log("pageX:" + pageX + "  pageY:" + pageY);
-              console.log("this.preX:" + this.preX + "  this.preY:" + this.preY);
-              console.log("currentPageId:" + this.currentPageId);
-              let item = this.items[this.currentPageId];
-                item.setNativeProps({
-                  //被移动的item的样式改变，要突出显示
-                    style: {
-                        elevation: 5
-                    }
-                });
-           },
-     onPanResponderMove: (evt, gestureState) => {
-          let top = this.preY + gestureState.dy;
-          let left = this.preX + gestureState.dx;
-          let item = this.items[this.currentPageId];
-          item.setNativeProps({
-              style: {top: top,left:left}
-          });
-           let collideIndex = this._getIdByPosition(evt.nativeEvent.pageX,evt.nativeEvent.pageY);  //获取当前的位置上item的id
-           console.log("X:" + evt.nativeEvent.pageX + "Y:" + evt.nativeEvent.pageY + "item:" + collideIndex);
-          if(collideIndex !== this.currentPageId && collideIndex !== -1) {          //判断是否和手上的item的id一样
-                   let collideItem = this.items[collideIndex];
-                   // console.log("top:"+this._getTopByPosition(this.currentPageId));
-                   // console.log("left:"+this._getLeftByPosition(this.currentPageId));
-                   collideItem.setNativeProps({
-                       style: {top: this._getTopByPosition(this.currentPageId),
-                              left:this._getLeftByPosition(this.currentPageId)
-                            }         //将collideItem的位置移动到手上的item的位置
-                   });
-                   [this.items[this.currentPageId], this.items[collideIndex]] = [this.items[collideIndex], this.items[this.currentPageId]];
-                   [this.order[this.currentPageId], this.order[collideIndex]] = [this.order[collideIndex], this.order[this.currentPageId]];
-                   this.currentPageId = collideIndex;
-          }
-      },
-
-    onPanResponderRelease:(evt, gestureState) => {
-      const shadowStyle = {
-                    elevation: 0
-                };
-              let item = this.items[this.currentPageId];
-               //go back the correct position
-              item.setNativeProps({
-                   style: {...shadowStyle, top: this._getTopByPosition(this.currentPageId),left:this._getLeftByPosition(this.currentPageId)}
-               });
-               console.log(this.order);
-    }
-   })
- }
 
  componentWillUpdate() {
    this._panResponder = PanResponder.create({
@@ -99,37 +37,35 @@ export default class MoveDemo extends Component<{}> {
               //locationX  相对于本身移动的位置
              // gestureState.{x,y}0 现在会被设置为0
               this.currentPageId = this._getIdByPosition(pageX,pageY);
-              this.preY = pageY - locationY - subHeight;   //TODO  此处的50为上面的View的高度
+              this.preY = pageY - locationY - subHeight;
               this.preX = pageX - locationX;
-              console.log("locationX:" + locationX + "  locationY:" + locationY);
-              console.log("pageX:" + pageX + "  pageY:" + pageY);
-              console.log("this.preX:" + this.preX + "  this.preY:" + this.preY);
-              console.log("currentPageId:" + this.currentPageId);
-              let item = this.items[this.currentPageId];
+              this._dealNullItem();
+              let item = items[this.currentPageId];
                 item.setNativeProps({
                   //被移动的item的样式改变，要突出显示
                     style: {
-                        elevation: 5
+                        elevation: 5,
+                        backgroundColor:'yellow'
                     }
                 });
            },
      onPanResponderMove: (evt, gestureState) => {
           let top = this.preY + gestureState.dy;
           let left = this.preX + gestureState.dx;
-          let item = this.items[this.currentPageId];
+          let item = items[this.currentPageId];
           item.setNativeProps({
               style: {top: top,left:left}
           });
            let collideIndex = this._getIdByPosition(evt.nativeEvent.pageX,evt.nativeEvent.pageY);  //获取当前的位置上item的id
-           console.log("X:" + evt.nativeEvent.pageX + "Y:" + evt.nativeEvent.pageY + "item:" + collideIndex);
+           // console.log("X:" + evt.nativeEvent.pageX + "Y:" + evt.nativeEvent.pageY + "item:" + collideIndex);
           if(collideIndex !== this.currentPageId && collideIndex !== -1) {          //判断是否和手上的item的id一样
-                   let collideItem = this.items[collideIndex];
+                   let collideItem = items[collideIndex];
                    collideItem.setNativeProps({
                        style: {top: this._getTopByPosition(this.currentPageId),
                               left:this._getLeftByPosition(this.currentPageId)
                             }         //将collideItem的位置移动到手上的item的位置
                    });
-                   [this.items[this.currentPageId], this.items[collideIndex]] = [this.items[collideIndex], this.items[this.currentPageId]];
+                   [items[this.currentPageId], items[collideIndex]] = [items[collideIndex], items[this.currentPageId]];
                    [this.order[this.currentPageId], this.order[collideIndex]] = [this.order[collideIndex], this.order[this.currentPageId]];
                    this.currentPageId = collideIndex;
           }
@@ -137,17 +73,21 @@ export default class MoveDemo extends Component<{}> {
 
     onPanResponderRelease:(evt, gestureState) => {
       const shadowStyle = {
-                    elevation: 0
+                    elevation: 0,
+                    backgroundColor:'green'
                 };
-              let item = this.items[this.currentPageId];
+              let item = items[this.currentPageId];
                //go back the correct position
               item.setNativeProps({
                    style: {...shadowStyle, top: this._getTopByPosition(this.currentPageId),left:this._getLeftByPosition(this.currentPageId)}
                });
-               console.log(this.order);
+                console.log("移动完成："+this.order);
+                // this._testItemPosition();   //TODO   此处打印所有item信息
+                console.log("********");      //TODO
     }
    })
  }
+
  //获取当前移动的是第几个元素
  _getIdByPosition(pageX,pageY){
     let postionPageY =  pageY - subHeight;  //TODO 减去这个View上面的高度在进行计算
@@ -158,8 +98,9 @@ export default class MoveDemo extends Component<{}> {
         id = 1;
     else if(pageX >= itemWidth * 2 + 3 * margLeft && pageX < (itemWidth + margLeft) * 3)
         id = 2;
-    else
-        return -1;    //移动到不在区域内的地区时不做任何处理
+    else {
+      return -1;    //移动到不在区域内的地区时不做任何处理
+    }
 
     if(postionPageY >= itemTop && postionPageY <= (itemHeight + itemTop)) {
       id += 0;
@@ -171,7 +112,7 @@ export default class MoveDemo extends Component<{}> {
       return -1;    //移动到俩个方块之间的区域的时候不做任何处理
     }
 
-    if(id > this.state.names.length - 1) {
+    if(id > this.order.length - 1) {
       return -1;
     }
     return id;
@@ -188,8 +129,35 @@ _getLeftByPosition(i) {
 _eventManagePress() {
   this.setState({
     isManage:!this.state.isManage,
-    manageName: this.state.manageName == "管理" ? "完成" : "管理"
+    manageName: this.state.manageName == "管理" ? "完成" : "管理",
+    viewSize:this.order.length
   })
+}
+
+//item除去null的选项
+_dealNullItem() {
+  var length = items.length;
+    for(var i = 0; i < length; i++)
+    {
+        if(items[i] == null)
+        {
+            if(i == 0)
+            {
+                items.shift(); //删除并返回数组的第一个元素
+                return;
+            }
+            else if(i == length-1)
+            {
+                items.pop();  //删除并返回数组的最后一个元素
+                return;
+            }
+            else
+            {
+                items.splice(i,1); //删除下标为i的元素
+                return;
+            }
+        }
+    }
 }
 
   render() {
@@ -203,7 +171,7 @@ _eventManagePress() {
         <View style={styles.smalltitle}>
           <Text style={{color:'blue',fontSize:16}}>首页应用</Text>
         </View>
-        <View style={[styles.indexapp,{height:(Math.floor(this.state.names.length  / colNum) + 1) * (itemHeight + itemTop)}]}>
+        <View style={[styles.indexapp,{height:(Math.floor(this.order.length  / colNum) + 1) * (itemHeight + itemTop)}]}>
           {this.getMoveView()}
         </View>
         <View style={styles.smalltitle}>
@@ -217,17 +185,16 @@ _eventManagePress() {
   }
 
   getMoveView() {
-    var cbMoveViewArr = [];
-    this.state.names.map((item,i)=>{
+    let cbMoveViewArr = [];
+    this.order.map((item,i)=>{
+      console.log("setState方法调用："+item);      //TODO
       let moveIcon = this.state.isManage ? <TouchableOpacity onPress={this._subIconPress.bind(this, item)}><Image source={require('../images/sub.png')} /></TouchableOpacity> : null
       var positionStyle={
         top:this._getTopByPosition(i),
         left:this._getLeftByPosition(i)
       }
-      this.order.push(item);
-      let needExtendsProps = (<View {...this._panResponder.panHandlers}  ref={(ref) => this.items[i] = ref} key={i} style={[styles.innerViewStyle,positionStyle]}><View style={styles.moveiconStyle}>{moveIcon}</View><Text>{item}</Text></View>)
-      let unNeedExtendsProps = (<View ref={(ref) => this.items[i] = ref} key={i} style={[styles.innerViewStyle,positionStyle]}><View style={styles.moveiconStyle}>{moveIcon}</View><Text>{item}</Text></View>)
-      let component = this.state.isManage ? needExtendsProps : unNeedExtendsProps
+      let component = this.state.isManage ? (<View {...this._panResponder.panHandlers} viewName={item} ref={(ref) => items[i] = ref} key={i} style={[styles.innerViewStyle,positionStyle]}><View style={styles.moveiconStyle}>{moveIcon}</View><Text>{item}</Text></View>) :  (<View viewName={item} ref={(ref) => items[i] = ref} key={i} style={[styles.innerViewStyle,positionStyle]}><View style={styles.moveiconStyle}>{moveIcon}</View><Text>{item}</Text></View>)
+       // let component = this.state.isManage ? (<View {...this._panResponder.panHandlers}  ref={(ref) => {(items[i] = (items[i] === undefined) ?ref:items[i])}} key={i} style={[styles.innerViewStyle,positionStyle]}><View style={styles.moveiconStyle}>{moveIcon}</View><Text>{item}</Text></View>) :  (<View ref={(ref) => {(items[i] = (items[i] === undefined) ?ref:items[i])}} key={i} style={[styles.innerViewStyle,positionStyle]}><View style={styles.moveiconStyle}>{moveIcon}</View><Text>{item}</Text></View>)
       cbMoveViewArr.push(
         component
       );
@@ -236,24 +203,35 @@ _eventManagePress() {
   }
 
   _addIconPress(addContext) {
-    let stateNamesArr = this.state.names;
-    stateNamesArr.push(addContext);
+    //排序数组增加
+    this.order.push(addContext);
+    console.log("增加之后的Order：" + this.order);
+    //stateNames增加
+    let stateNamesArr = [...this.order];
+
+    //items初始位置增加
+    this.mappingItems.push(addContext);
+
     this.setState({
-      names:stateNamesArr
+      viewSize:this.order.length
     });
   }
 
   _subIconPress(subContext) {
-    let stateNamesArr = this.state.names;
-    let index;
-    stateNamesArr.map((item,i)=>{
-      if(item == subContext) {
-        index = i;
+    //排序数组删除
+    let orderIndex;
+    this.order.map((ord,i)=>{
+      if(ord == subContext) {
+        orderIndex = i;
       }
     })
-    stateNamesArr.splice(index,1);
+    this.order.splice(orderIndex,1);
+
+    let stateNamesArr = [...this.order];
+    console.log("删除之后的Order：" + this.order);
+    // this._testDeleteItem(subContext);    //TODO   此处删除一个Item
     this.setState({
-      names:stateNamesArr
+      viewSize:this.order.length
     });
   }
 
@@ -263,7 +241,7 @@ _eventManagePress() {
       let allAppIconSub = this.state.isManage ? <TouchableOpacity onPress={this._subIconPress.bind(this, item.text)}><Image source={require('../images/sub.png')} /></TouchableOpacity> : null
       let allAppIconAdd = this.state.isManage ? <TouchableOpacity onPress={this._addIconPress.bind(this, item.text)}><Image source={require('../images/add.png')} /></TouchableOpacity> : null
       let tmp = null;
-      if(this.state.names.indexOf(item.text) > -1) {
+      if(this.order.indexOf(item.text) > -1) {
         tmp = allAppIconSub
       }else {
         tmp = allAppIconAdd
