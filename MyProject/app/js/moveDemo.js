@@ -26,6 +26,9 @@ export default class MoveDemo extends Component<{}> {
 
   }
 
+// componentDidMount() {
+//   console.log(items);
+// }
  componentWillUpdate() {
    this._panResponder = PanResponder.create({
      onStartShouldSetPanResponder: (evt, gestureState) => true,
@@ -82,9 +85,19 @@ export default class MoveDemo extends Component<{}> {
                    style: {...shadowStyle, top: this._getTopByPosition(this.currentPageId),left:this._getLeftByPosition(this.currentPageId)}
                });
                 console.log("移动完成："+this.order);
-                // this._testItemPosition();   //TODO   此处打印所有item信息
-                console.log("********");      //TODO
     }
+   })
+ }
+
+ componentDidUpdate() {
+   // console.log(items);
+  this._dealNullItem();
+   items.map((item,i)=>{
+     item.setNativeProps({
+         style: {top: this._getTopByPosition(i),
+                left:this._getLeftByPosition(i)
+              }         //将collideItem的位置移动到手上的item的位置
+     });
    })
  }
 
