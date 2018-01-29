@@ -11,13 +11,15 @@ const itemWidth = 100
 const itemTop = 10
 const colNum = 3
 const subHeight = 80
-var items = []
+var items = [];
+
+
 export default class MoveDemo extends Component<{}> {
 
   constructor(props) {
     super(props);
-    this.mappingItems = ['客户信息','当前故障','当前投诉','业务开通','业务性能'];
     this.order = ['客户信息','当前故障','当前投诉','业务开通','业务性能'];
+    
     this.state = {
       isManage : false,
       manageName:"管理",
@@ -221,9 +223,6 @@ _dealNullItem() {
     console.log("增加之后的Order：" + this.order);
     //stateNames增加
     let stateNamesArr = [...this.order];
-
-    //items初始位置增加
-    this.mappingItems.push(addContext);
 
     this.setState({
       viewSize:this.order.length
